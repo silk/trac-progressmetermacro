@@ -3,6 +3,8 @@
 import os
 import re
 
+from genshi.builder import tag
+
 from trac.config import ExtensionOption, ExtensionPoint
 from trac.core import *
 from trac.ticket.query import Query
@@ -62,6 +64,8 @@ class ProgressMeterMacro(WikiMacroBase):
         # number, if available
         for key in kwargs.keys():
             if kwargs[key] == 'self':
+                if req.path_info == '/newticket':
+                    return None, None, True
                 current_ticket = self._this_ticket(req)
                 if current_ticket: kwargs[key] = current_ticket
 
@@ -83,11 +87,16 @@ class ProgressMeterMacro(WikiMacroBase):
             # propagate the stats provider defined in the config file
             stats_provider = self._sp
 
-        return stats_provider, kwargs
+        return stats_provider, kwargs, False
 
     def expand_macro(self, formatter, name, content):
         req = formatter.req
-        stats_provider, kwargs = self._parse_macro_content(content, req)
+        stats_provider, kwargs, is_preview_with_self = self._parse_macro_content(content, req)
+
+        if is_preview_with_self:
+            # previewing newticket, without a number but with a reference
+            # to current ticket number; show a helpful message
+            return tag.div('Progress meter will be inserted here in final ticket')
 
         # Create & execute the query string
         qstr = '&'.join(['%s=%s' % item
