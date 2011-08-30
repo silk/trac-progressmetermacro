@@ -63,7 +63,7 @@ class ProgressMeterMacro(WikiMacroBase):
         for key in kwargs.keys():
             if kwargs[key] == 'self':
                 current_ticket = self._this_ticket(req)
-                if current_ticket: kwargs[key] = current_ticket
+                if current_ticket: kwargs[key] = "#%s" % current_ticket
 
         try:
             spkw = kwargs.pop('stats_provider')
