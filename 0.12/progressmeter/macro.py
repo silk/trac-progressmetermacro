@@ -67,7 +67,7 @@ class ProgressMeterMacro(WikiMacroBase):
                 if req.path_info == '/newticket':
                     return None, None, True
                 current_ticket = self._this_ticket(req)
-                if current_ticket: kwargs[key] = "#%s" % current_ticket
+                if current_ticket: kwargs[key] = current_ticket
 
         try:
             spkw = kwargs.pop('stats_provider')
